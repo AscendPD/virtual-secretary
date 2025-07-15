@@ -18,12 +18,12 @@ prompt = st.text_input("What do you want me to do?", "")
 if prompt:
     st.session_state.chat_history.append(("You", prompt))
     
-client = openai.OpenAI()
-response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[{"role": "user", "content": prompt}]
-)
-reply = response.choices[0].message.content
+    client = openai.OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    reply = response.choices[0].message.content
 
     )
     reply = response['choices'][0]['message']['content']
