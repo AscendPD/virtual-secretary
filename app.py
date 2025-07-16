@@ -79,14 +79,25 @@ if user_input:
         system_prompt = (
             "You are a helpful virtual secretary. If the user asks you to send an email, "
             "parse it and reply with a JSON object like this: "
-            "{\"action\": \"send_email\", \"name\": \"Priscilla\", \"message\": \"Let's meet at 2pm\"}.\n"
+            '{"action": "send_email", "name": "Priscilla", "message": "Let\'s meet at 2pm"}.\n'
             "If the input is not an actionable command, just reply conversationally."
         )
 
+        messages = [
+            {"role": "system", "content": system_prompt}
+        ] + st.session_state.chat_history
 
-messages = [
-    {"role": "system", "content": system_prompt}
-] + st.session_state.chat_history
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+        )
+
+        reply = response.choices[0].message.content
+        st.session_state.chat_history.append({"role": "assistant", "content": reply})
+
+
+
+
 
 with st.spinner("Thinking..."):
     response = client.chat.completions.create(
