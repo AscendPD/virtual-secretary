@@ -30,10 +30,20 @@ st.title("🧠 Virtual Secretary")
 st.write("Loading app...")
 
 query_params = st.query_params
+st.write("Full query params:", query_params)  # ✅ DEBUG: See what's inside
 
 if "code" in query_params:
-    code = query_params["code"][0]
-    st.write("✅ Step 1: Code received:", code)
+    raw_code = query_params["code"]
+    st.write("Raw code value:", raw_code)  # ✅ DEBUG: Before checking type
+
+    # If it's a list, extract the first item
+    if isinstance(raw_code, list):
+        code = raw_code[0]
+    else:
+        code = raw_code
+
+    st.write("Final code used:", code)  # ✅ DEBUG: The actual code being sent
+
 
     # Exchange authorization code for tokens
     st.write("✅ Step 2: Preparing token request...")
