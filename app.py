@@ -74,3 +74,4 @@ if "access_token" not in st.session_state:
 # Chatbot UI
 client = OpenAI(api_key=OPENAI_KEY)
 if "chat_history" not in st.se_:
+    st.session_state.chat_history = []
