@@ -22,10 +22,31 @@ st.title("🧠 Virtual Secretary")
 
 query_params = st.query_params
 
+import requests
+
 if "code" in query_params:
-    st.success("Authorization code received!")
-    st.write("This is where we’ll handle token exchange next.")
-    st.code(query_params["code"][0])
+    code = query_params["code"][0]
+
+    # Exchange code for tokens
+    token_url = "https://oauth2.googleapis.com/token"
+    data = {
+        "code": code,
+        "client_id": CLIENT_ID,
+        "client_secret": st.secrets["google_oauth"]["client_secret"],
+        "redirect_uri": REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }
+
+    response = requests.post(token_url, data=data)
+
+    if response.status_code == 200:
+        tokens = response.json()
+        st.success("🎉 Access token retrieved successfully!")
+        st.json(tokens)
+    else:
+        st.error("❌ Failed to exchange code for token.")
+        st.write(response.text)
+
 else:
     st.write("To begin, sign in with Google:")
     st.markdown(f"[Click here to authenticate with Google]({AUTH_URL})")
