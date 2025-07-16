@@ -11,12 +11,12 @@ REDIRECT_URI = st.secrets["google_oauth"]["redirect_uri"]
 OPENAI_KEY = st.secrets["OPENAI_API_KEY"]
 
 SCOPES = (
-    "https://www.googleapis.com/auth/calendar "
-    "https://www.googleapis.com/auth/gmail.send "
-    "https://www.googleapis.com/auth/drive.metadata.readonly"
-    "https://www.googleapis.com/auth/contacts.readonly"
-
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+    "https://www.googleapis.com/auth/contacts.readonly",
 )
+
 
 AUTH_URL = (
     "https://accounts.google.com/o/oauth2/v2/auth"
