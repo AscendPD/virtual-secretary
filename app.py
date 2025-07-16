@@ -33,6 +33,8 @@ query_params = st.query_params
 
 if "code" in query_params and "access_token" not in st.session_state:
     code = query_params["code"][0]
+    st.markdown(f"✅ Step 1: Code received: `{code}`")
+    
     token_url = "https://oauth2.googleapis.com/token"
     data = {
         "code": code,
@@ -41,16 +43,29 @@ if "code" in query_params and "access_token" not in st.session_state:
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
     }
-    response = requests.post(token_url, data=data)
+
+    st.markdown("✅ Step 2: Preparing token request...")
+    st.json(data)
+
+    try:
+        response = requests.post(token_url, data=data, timeout=10)
+    except Exception as e:
+        st.error(f"❌ Step 3: Request failed: {e}")
+        st.stop()
+
+    st.markdown("✅ Step 3: Response received.")
+    st.json(response.json())
+
     if response.status_code == 200:
         tokens = response.json()
         st.session_state.access_token = tokens["access_token"]
         st.success("✅ Google access granted!")
     else:
         st.error("❌ Token exchange failed.")
+        st.code(response.text)
         st.stop()
 
-# Show auth link if not authenticated yet
+# Auth step
 if "access_token" not in st.session_state:
     st.write("Please sign in with Google to begin:")
     st.markdown(f"[Click here to authenticate with Google]({AUTH_URL})")
@@ -58,30 +73,4 @@ if "access_token" not in st.session_state:
 
 # Chatbot UI
 client = OpenAI(api_key=OPENAI_KEY)
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
-
-prompt = st.text_input("What do you want me to do?", "")
-
-if prompt:
-    st.session_state.chat_history.append(("You", prompt))
-    
-    system_message = (
-        "You are a virtual assistant with access to the user's Gmail, Calendar, and Drive. "
-        f"The user's Google access token is: {st.session_state.access_token}. "
-        "Use this info to decide what to do next. Respond with clear steps."
-    )
-
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": prompt}
-        ]
-    )
-
-    reply = response.choices[0].message.content
-    st.session_state.chat_history.append(("Secretary", reply))
-
-for speaker, text in st.session_state.chat_history:
-    st.markdown(f"**{speaker}:** {text}")
+if "chat_history" not in st.se_
