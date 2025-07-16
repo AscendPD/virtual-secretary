@@ -76,12 +76,13 @@ if user_input:
     st.session_state.chat_history.append({"role": "user", "content": user_input})
     with st.spinner("Thinking..."):
         # Step 2: Enhanced chatbot logic with intent extraction
-system_prompt = (
-    "You are a helpful virtual secretary. If the user asks you to send an email, "
-    "parse it and reply with a JSON object like this: "
-    "{\"action\": \"send_email\", \"name\": \"Priscilla\", \"message\": \"Let's meet at 2pm\"}.\n"
-    "If the input is not an actionable command, just reply conversationally."
-)
+        system_prompt = (
+            "You are a helpful virtual secretary. If the user asks you to send an email, "
+            "parse it and reply with a JSON object like this: "
+            "{\"action\": \"send_email\", \"name\": \"Priscilla\", \"message\": \"Let's meet at 2pm\"}.\n"
+            "If the input is not an actionable command, just reply conversationally."
+        )
+
 
 messages = [
     {"role": "system", "content": system_prompt}
