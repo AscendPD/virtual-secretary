@@ -14,6 +14,8 @@ SCOPES = (
     "https://www.googleapis.com/auth/calendar "
     "https://www.googleapis.com/auth/gmail.send "
     "https://www.googleapis.com/auth/drive.metadata.readonly"
+    "https://www.googleapis.com/auth/contacts.readonly"
+
 )
 
 AUTH_URL = (
@@ -73,10 +75,27 @@ user_input = st.text_input("You:", key="user_input")
 if user_input:
     st.session_state.chat_history.append({"role": "user", "content": user_input})
     with st.spinner("Thinking..."):
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=st.session_state.chat_history,
-        )
+        # Step 2: Enhanced chatbot logic with intent extraction
+system_prompt = (
+    "You are a helpful virtual secretary. If the user asks you to send an email, "
+    "parse it and reply with a JSON object like this: "
+    "{\"action\": \"send_email\", \"name\": \"Priscilla\", \"message\": \"Let's meet at 2pm\"}.\n"
+    "If the input is not an actionable command, just reply conversationally."
+)
+
+messages = [
+    {"role": "system", "content": system_prompt}
+] + st.session_state.chat_history
+
+with st.spinner("Thinking..."):
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=messages,
+    )
+
+reply = response.choices[0].message.content
+st.session_state.chat_history.append({"role": "assistant", "content": reply})
+
     reply = response.choices[0].message.content
     st.session_state.chat_history.append({"role": "assistant", "content": reply})
 
