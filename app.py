@@ -32,6 +32,7 @@ st.title("🧠 Virtual Secretary")
 query_params = st.query_params
 
 if "code" in query_params and "access_token" not in st.session_state:
+    st.write("DEBUG - Full query_params:", query_params)
     code = query_params["code"][0]
     st.markdown(f"✅ Step 1: Code received: `{code}`")
     
