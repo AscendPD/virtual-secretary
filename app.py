@@ -33,9 +33,11 @@ query_params = st.query_params
 
 if "code" in query_params:
     code = query_params["code"][0]
-    st.write("Code received:", code)
+    st.write("✅ Step 1: Code received:", code)
 
     # Exchange authorization code for tokens
+    st.write("✅ Step 2: Preparing token request...")
+
     token_url = "https://oauth2.googleapis.com/token"
     data = {
         "code": code,
@@ -45,18 +47,23 @@ if "code" in query_params:
         "grant_type": "authorization_code",
     }
 
+    st.write("✅ Step 3: Sending POST to token endpoint...")
+
     try:
         response = requests.post(token_url, data=data, timeout=10)
+        st.write("✅ Step 4: Response received.")
     except Exception as e:
-        st.error(f"Request failed: {e}")
+        st.error(f"❌ Request failed: {e}")
     else:
         if response.status_code == 200:
+            st.write("✅ Step 5: Token retrieved successfully.")
             tokens = response.json()
-            st.success("🎉 Access token retrieved successfully!")
+            st.success("🎉 Access token retrieved!")
             st.json(tokens)
         else:
             st.error("❌ Failed to exchange code for token.")
             st.write(response.text)
+
 else:
     st.write("To begin, sign in with Google:")
     st.markdown(f"[Click here to authenticate with Google]({AUTH_URL})")
