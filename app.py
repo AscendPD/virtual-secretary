@@ -74,6 +74,30 @@ if "access_token" not in st.session_state:
 
 # Chatbot UI
 client = OpenAI(api_key=OPENAI_KEY)
+
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+
+st.subheader("💬 Chat with your Virtual Secretary")  # Moved outside the block
+
+user_input = st.text_input("You:", key="user_input")
+
+if user_input:
+    st.session_state.chat_history.append({"role": "user", "content": user_input})
+    with st.spinner("Thinking..."):
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=st.session_state.chat_history,
+        )
+    reply = response.choices[0].message.content
+    st.session_state.chat_history.append({"role": "assistant", "content": reply})
+
+# Display full chat history
+for msg in st.session_state.chat_history:
+    if msg["role"] == "user":
+        st.markdown(f"🧑‍💻 **You:** {msg['content']}")
+    else:
+        st.markdown(f"🤖 **Assistant:** {msg['content']}")
+
+
 
