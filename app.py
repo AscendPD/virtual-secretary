@@ -94,9 +94,6 @@ with st.spinner("Thinking..."):
         messages=messages,
     )
 
-reply = response.choices[0].message.content
-st.session_state.chat_history.append({"role": "assistant", "content": reply})
-
     reply = response.choices[0].message.content
     st.session_state.chat_history.append({"role": "assistant", "content": reply})
 
