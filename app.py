@@ -15,7 +15,7 @@ if prompt:
     st.session_state.chat_history.append(("You", prompt))
 
     response = client.chat.completions.create(
-        model="gpt-4-1106-nano",
+        model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
 
