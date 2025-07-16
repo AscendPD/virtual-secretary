@@ -23,7 +23,7 @@ AUTH_URL = (
     f"?client_id={CLIENT_ID}"
     f"&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
     f"&response_type=code"
-    f"&scope={urllib.parse.quote(SCOPES)}"
+    f"&scope={urllib.parse.quote(' '.join(SCOPES))}"
     f"&access_type=offline"
     f"&prompt=consent"
 )
