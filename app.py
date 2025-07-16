@@ -32,10 +32,7 @@ st.title("🧠 Virtual Secretary")
 query_params = st.query_params
 
 if "code" in query_params and "access_token" not in st.session_state:
-    st.write("DEBUG - Full query_params:", query_params)
     code = query_params["code"]
-    st.markdown(f"✅ Step 1: Code received: `{code}`")
-    
     token_url = "https://oauth2.googleapis.com/token"
     data = {
         "code": code,
@@ -45,17 +42,11 @@ if "code" in query_params and "access_token" not in st.session_state:
         "grant_type": "authorization_code",
     }
 
-    st.markdown("✅ Step 2: Preparing token request...")
-    st.json(data)
-
     try:
         response = requests.post(token_url, data=data, timeout=10)
     except Exception as e:
-        st.error(f"❌ Step 3: Request failed: {e}")
+        st.error(f"❌ Token request failed: {e}")
         st.stop()
-
-    st.markdown("✅ Step 3: Response received.")
-    st.json(response.json())
 
     if response.status_code == 200:
         tokens = response.json()
@@ -63,7 +54,6 @@ if "code" in query_params and "access_token" not in st.session_state:
         st.success("✅ Google access granted!")
     else:
         st.error("❌ Token exchange failed.")
-        st.code(response.text)
         st.stop()
 
 # Auth step
@@ -74,11 +64,9 @@ if "access_token" not in st.session_state:
 
 # Chatbot UI
 client = OpenAI(api_key=OPENAI_KEY)
-
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
-
-st.subheader("💬 Chat with your Virtual Secretary")  # Moved outside the block
+    st.subheader("💬 Chat with your Virtual Secretary")
 
 user_input = st.text_input("You:", key="user_input")
 
@@ -98,6 +86,3 @@ for msg in st.session_state.chat_history:
         st.markdown(f"🧑‍💻 **You:** {msg['content']}")
     else:
         st.markdown(f"🤖 **Assistant:** {msg['content']}")
-
-
-
