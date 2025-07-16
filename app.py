@@ -1,11 +1,19 @@
 import streamlit as st
 import os
 import urllib.parse
+import time
+import requests
 
 # Load secrets
 CLIENT_ID = st.secrets["google_oauth"]["client_id"]
 REDIRECT_URI = st.secrets["google_oauth"]["redirect_uri"]
-SCOPES = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.metadata.readonly"
+CLIENT_SECRET = st.secrets["google_oauth"]["client_secret"]
+
+SCOPES = (
+    "https://www.googleapis.com/auth/calendar.readonly "
+    "https://www.googleapis.com/auth/gmail.readonly "
+    "https://www.googleapis.com/auth/drive.metadata.readonly"
+)
 
 # Build Google OAuth URL
 AUTH_URL = (
@@ -19,34 +27,36 @@ AUTH_URL = (
 )
 
 st.title("🧠 Virtual Secretary")
+st.write("Loading app...")
 
 query_params = st.query_params
 
-import requests
-
 if "code" in query_params:
     code = query_params["code"][0]
+    st.write("Code received:", code)
 
-    # Exchange code for tokens
+    # Exchange authorization code for tokens
     token_url = "https://oauth2.googleapis.com/token"
     data = {
         "code": code,
         "client_id": CLIENT_ID,
-        "client_secret": st.secrets["google_oauth"]["client_secret"],
+        "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
     }
 
-    response = requests.post(token_url, data=data)
-
-    if response.status_code == 200:
-        tokens = response.json()
-        st.success("🎉 Access token retrieved successfully!")
-        st.json(tokens)
+    try:
+        response = requests.post(token_url, data=data, timeout=10)
+    except Exception as e:
+        st.error(f"Request failed: {e}")
     else:
-        st.error("❌ Failed to exchange code for token.")
-        st.write(response.text)
-
+        if response.status_code == 200:
+            tokens = response.json()
+            st.success("🎉 Access token retrieved successfully!")
+            st.json(tokens)
+        else:
+            st.error("❌ Failed to exchange code for token.")
+            st.write(response.text)
 else:
     st.write("To begin, sign in with Google:")
     st.markdown(f"[Click here to authenticate with Google]({AUTH_URL})")
