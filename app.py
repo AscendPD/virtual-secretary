@@ -33,7 +33,7 @@ query_params = st.query_params
 
 if "code" in query_params and "access_token" not in st.session_state:
     st.write("DEBUG - Full query_params:", query_params)
-    code = query_params["code"][0]
+    code = query_params["code"]
     st.markdown(f"✅ Step 1: Code received: `{code}`")
     
     token_url = "https://oauth2.googleapis.com/token"
@@ -74,5 +74,6 @@ if "access_token" not in st.session_state:
 
 # Chatbot UI
 client = OpenAI(api_key=OPENAI_KEY)
-if "chat_history" not in st.se_:
+if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+
