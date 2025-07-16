@@ -1,36 +1,38 @@
 import streamlit as st
-from openai import OpenAI
+from requests_oauthlib import OAuth2Session
+import os
 
 st.set_page_config(page_title="Virtual Secretary", layout="wide")
 st.title("🧠 Virtual Secretary")
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Load secrets
+client_id = st.secrets["google_oauth"]["client_id"]
+client_secret = st.secrets["google_oauth"]["client_secret"]
+redirect_uri = st.secrets["google_oauth"]["redirect_uri"]
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+# OAuth endpoints
+authorization_base_url = "https://accounts.google.com/o/oauth2/v2/auth"
+token_url = "https://oauth2.googleapis.com/token"
+scope = [
+    "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/drive.readonly",
+    "openid", "email", "profile"
+]
 
-if "user_input" not in st.session_state:
-    st.session_state.user_input = ""
+# Session state setup
+if "token" not in st.session_state:
+    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+    authorization_url, state = google.authorization_url(
+        authorization_base_url,
+        access_type="offline",
+        prompt="consent"
+    )
 
-def handle_input():
-    prompt = st.session_state.user_input.strip()
-    if prompt:
-        st.session_state.chat_history.append(("You", prompt))
+    st.markdown(f"[Click here to authenticate with Google]({authorization_url})")
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}]
-        )
+    st.stop()
 
-        reply = response.choices[0].message.content
-        st.session_state.chat_history.append(("Bot", reply))
-
-        # Clear the input box
-        st.session_state.user_input = ""
-
-# Input box with callback
-st.text_input("What do you want me to do?", key="user_input", on_change=handle_input)
-
-# Display chat history
-for speaker, text in st.session_state.chat_history:
-    st.markdown(f"**{speaker}:** {text}")
+else:
+    # You'd add app logic here (e.g., compose email, add calendar event)
+    st.success("✅ Authenticated! Ready to use Gmail, Calendar, and Drive.")
